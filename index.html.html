@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>CV Generator</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #f1f1f1;
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    body[dir="rtl"] {
+      direction: rtl;
+    }
+    body[dir="ltr"] {
+      direction: ltr;
+    }
+    select, input, textarea {
+      background-color: #1e1e1e;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+      width: 90%;
+      max-width: 400px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      margin: 10px 5px;
+      cursor: pointer;
+    }
+    #cv {
+      display: none;
+      background-color: #1e1e1e;
+      margin: 40px auto;
+      padding: 20px;
+      max-width: 600px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    }
+    #cv img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body dir="rtl">
+  <h1 id="title">مولّد السيرة الذاتية</h1>
+
+  <select id="language" onchange="changeLanguage()">
+    <option value="ar">العربية</option>
+    <option value="en">English</option>
+    <option value="fr">Français</option>
+  </select>
+
+  <br><input type="text" id="name" placeholder="الاسم الكامل">
+  <br><select id="job">
+    <option value="">اختر الوظيفة</option>
+    <option>مبرمج / Programmer / Développeur</option>
+    <option>مصمم / Designer / Designer</option>
+    <option>طبيب / Doctor / Médecin</option>
+    <option>معلم / Teacher / Enseignant</option>
+    <option>مهندس / Engineer / Ingénieur</option>
+  </select>
+  <br><input type="email" id="email" placeholder="البريد الإلكتروني">
+  <br><input type="text" id="phone" placeholder="رقم الهاتف">
+  <br><textarea id="about" placeholder="نبذة عنك..."></textarea>
+  <br>
+  <label id="photoLabel">أرفق صورتك:</label><br>
+  <input type="file" id="photoInput" accept="image/*">
+  <br>
+  <button onclick="generateCV()" id="generateBtn">إنشاء السيرة</button>
+  <button onclick="downloadPDF()" id="downloadBtn">تحميل PDF</button>
+
+  <div id="cv">
+    <img id="cvPhoto" src="">
+    <h2 id="cvName"></h2>
+    <h3 id="cvJob"></h3>
+    <p id="cvEmail"></p>
+    <p id="cvPhone"></p>
+    <p id="cvAbout"></p>
+  </div>
+
+  <!-- مكتبة التحويل إلى PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+  <script>
+    const langData = {
+      ar: {
+        dir: "rtl",
+        title: "مولّد السيرة الذاتية",
+        name: "الاسم الكامل",
+        job: "اختر الوظيفة",
+        email: "البريد الإلكتروني",
+        phone: "رقم الهاتف",
+        about: "نبذة عنك...",
+        photo: "أرفق صورتك:",
+        generate: "إنشاء السيرة",
+        download: "تحميل PDF"
+      },
+      en: {
+        dir: "ltr",
+        title: "Resume Generator",
+        name: "Full Name",
+        job: "Select Job",
+        email: "Email",
+        phone: "Phone Number",
+        about: "About You...",
+        photo: "Upload your photo:",
+        generate: "Generate Resume",
+        download: "Download PDF"
+      },
+      fr: {
+        dir: "ltr",
+        title: "Générateur de CV",
+        name: "Nom complet",
+        job: "Choisissez un métier",
+        email: "Email",
+        phone: "Numéro de téléphone",
+        about: "À propos de vous...",
+        photo: "Téléchargez votre photo :",
+        generate: "Générer le CV",
+        download: "Télécharger PDF"
+      }
+    };
+
+    function changeLanguage() {
+      const lang = document.getElementById("language").value;
+      const t = langData[lang];
+      document.body.setAttribute("dir", t.dir);
+      document.getElementById("title").innerText = t.title;
+      document.getElementById("name").placeholder = t.name;
+      document.getElementById("job").options[0].text = t.job;
+      document.getElementById("email").placeholder = t.email;
+      document.getElementById("phone").placeholder = t.phone;
+      document.getElementById("about").placeholder = t.about;
+      document.getElementById("photoLabel").innerText = t.photo;
+      document.getElementById("generateBtn").innerText = t.generate;
+      document.getElementById("downloadBtn").innerText = t.download;
+    }
+
+    function generateCV() {
+      document.getElementById("cvName").innerText = document.getElementById("name").value;
+      document.getElementById("cvJob").innerText = document.getElementById("job").value;
+      document.getElementById("cvEmail").innerText = "📧 " + document.getElementById("email").value;
+      document.getElementById("cvPhone").innerText = "📞 " + document.getElementById("phone").value;
+      document.getElementById("cvAbout").innerText = document.getElementById("about").value;
+      document.getElementById("cv").style.display = "block";
+    }
+
+    document.getElementById("photoInput").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = document.getElementById("cvPhoto");
+          img.src = evt.target.result;
+          img.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function downloadPDF() {
+      const element = document.getElementById("cv");
+      html2pdf().from(element).save("MyCV.pdf");
+    }
+
+    // تفعيل اللغة العربية عند التحميل
+    changeLanguage();
+  </script>
+</body>
+</html>
